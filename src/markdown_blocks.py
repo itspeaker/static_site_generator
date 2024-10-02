@@ -33,10 +33,10 @@ def text_to_html(block, block_type):
             return ParentNode(f'h{count}', children_list)
         return LeafNode(f'h{count}', block[count + 1 :])
     if block_type == quote_type:
-        children_list = text_to_children(block[3:])
+        children_list = text_to_children(block[2:])
         if len(children_list) > 1:
             return ParentNode('blockquote', children_list)
-        return LeafNode('blockquote', block[3:])
+        return LeafNode('blockquote', block[2:])
     if block_type == code_type:
         children_list = text_to_children(block.strip('```'))
         if len(children_list) > 1:
@@ -62,6 +62,7 @@ def text_to_html(block, block_type):
             else:
                 nodes.append(LeafNode('li', item[3:]))
         return ParentNode('ol', nodes)
+    raise Exception('Invalid block type')
 
 
 def markdown_to_html_node(markdown: str) -> HTMLNode:
@@ -77,8 +78,7 @@ def markdown_to_blocks(markdown: str):
     blocks = markdown.split('\n\n')
 
     stripped = map(lambda x: x.strip(' ').strip('\n'), blocks)
-    filtered = list(filter(lambda x: x, stripped))
-    return filtered
+    return list(filter(lambda x: x, stripped))
 
 
 def block_to_block_type(block: str):
@@ -103,3 +103,11 @@ def block_to_block_type(block: str):
                 return paragraph_type
         return ordered_list_type
     return paragraph_type
+
+
+def extarct_title(markdown: str):
+    blocks = markdown_to_blocks(markdown)
+    for block in blocks:
+        if block_to_block_type(block) == heading_type and block.startswith('# '):
+            return block.strip('#').strip()
+    raise Exception('No header in markdown')

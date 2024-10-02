@@ -1,8 +1,9 @@
 import unittest
 
-from block_markdown import (
+from markdown_blocks import (
     block_to_block_type,
     code_type,
+    extarct_title,
     heading_type,
     markdown_to_blocks,
     markdown_to_html_node,
@@ -36,7 +37,7 @@ This is another paragrapgh
 """
 
 
-class TestBlockMarkdown(unittest.TestCase):
+class TestMarkdownBlocks(unittest.TestCase):
     def test_markdown_to_blocks(self):
         result = markdown_to_blocks(markdown)
         expected = [
@@ -100,4 +101,18 @@ This is another paragraph with *italic* text and `code` here
         result = markdown_to_html_node(md)
         expected = '<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>'
         self.assertEqual(result.to_html(), expected)
-        self.assertEqual
+
+    def test_extract_title(self):
+        result = extarct_title(markdown)
+        assert result == 'This is a heading'
+        md = """
+### This is an h3
+"""
+        with self.assertRaises(Exception):
+            extarct_title(md)
+        md = """
+### H3
+
+# H1   
+"""
+        self.assertEqual(extarct_title(md), 'H1')
